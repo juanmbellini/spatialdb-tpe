@@ -58,7 +58,7 @@ The result will be returned ordered by distance
 
 ### Get all branches within a distance from each city
 
-This query will return all the branches that are within a certian distance from each city saved in the database. Is similar to the previous queries, but using as a center the saved cities points. The spheroid variable must be set to ```true``` of ```false``` in order to set how the distance must be calculated. The SQL script to be used is ```cityBranches.sql```.
+This query will return all the branches that are within a certian distance from each city saved in the database. Is similar to the previous queries, but using as a center the saved cities points. The spheroid variable must be set to ```true``` or ```false``` in order to set how the distance must be calculated. The SQL script to be used is ```cityBranches.sql```.
 
 ```sql
 \timing
