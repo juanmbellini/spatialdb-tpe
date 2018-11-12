@@ -1,0 +1,9 @@
+{
+  "properties": [
+    {
+      "name": "ar.edu.itba.spatial_db.tpe.pg_loader",
+      "type": "java.lang.String",
+      "description": "The execution's mode."
+    }
+  ]
+}

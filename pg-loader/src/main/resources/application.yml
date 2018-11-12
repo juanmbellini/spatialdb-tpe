@@ -1,0 +1,34 @@
+# Default Configuration
+
+spring:
+    profiles:
+        active: dev
+    main:
+        banner-mode: "off"
+
+    datasource:
+            url: jdbc:postgresql://localhost:5432/spatialdb-tpe
+            username: spatialdb
+            password: 12345678
+
+---
+# Configuration for Development Environment
+
+spring:
+    profiles:
+    - dev
+    - development
+
+
+---
+# Configuration for Production Environment
+
+spring:
+    profiles:
+    - prod
+    - production
+
+logging:
+    level:
+        root: WARN
+        ar.edu.itba.spatial_db.tpe.pg_loader: INFO
