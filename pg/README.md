@@ -61,6 +61,7 @@ The result will be returned ordered by distance
 This query will return all the branches that are within a certian distance from each city saved in the database. Is similar to the previous queries, but using as a center the saved cities points. The spheroid variable must be set to ```true``` of ```false``` in order to set how the distance must be calculated. The SQL script to be used is ```cityBranches.sql```.
 
 ```sql
+\timing
 SELECT
     c.name                                              AS "City Name",
     jsonb_pretty(json_agg(json_build_object(
