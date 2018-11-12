@@ -10,13 +10,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 import static com.fasterxml.jackson.annotation.JsonProperty.Access.WRITE_ONLY;
 
 /**
- * An object in charge of reading sube branches data from external JSON file.
+ * An object in charge of reading sube branches data from external Json file.
  */
 @Component
 public class SubeBranchTsvDataReader
@@ -50,9 +50,10 @@ public class SubeBranchTsvDataReader
         this.objectMapper.disable(DeserializationFeature.FAIL_ON_MISSING_CREATOR_PROPERTIES);
     }
 
+
     @Override
-    protected File provideFile() throws IOException {
-        return branchesJsonDataFile.getFile();
+    protected InputStream provideInputStream() throws IOException {
+        return branchesJsonDataFile.getInputStream();
     }
 
     @Override

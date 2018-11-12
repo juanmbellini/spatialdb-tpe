@@ -10,14 +10,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 import static com.fasterxml.jackson.annotation.JsonProperty.Access.WRITE_ONLY;
 
 /**
- * Created by Juan Marcos Bellini on 11/11/18.
+ * An object in charge of reading cities data from external GeoJson file.
  */
 @Component
 public class CitiesGeoJsonDataReader
@@ -47,8 +47,8 @@ public class CitiesGeoJsonDataReader
 
 
     @Override
-    protected File provideFile() throws IOException {
-        return citiesGeoJsonDataFile.getFile();
+    protected InputStream provideInputStream() throws IOException {
+        return citiesGeoJsonDataFile.getInputStream();
     }
 
     @Override

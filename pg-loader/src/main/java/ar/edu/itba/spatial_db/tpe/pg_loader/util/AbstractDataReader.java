@@ -3,9 +3,8 @@ package ar.edu.itba.spatial_db.tpe.pg_loader.util;
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * An abstract data reader.
@@ -13,14 +12,13 @@ import java.io.IOException;
 public abstract class AbstractDataReader<DTO> implements DataReader<DTO> {
     @Override
     public MappingIterator<DTO> readData() throws IOException {
-        final var reader = new FileReader(provideFile());
-        return provideObjectMapper().readerFor(provideClass()).readValues(reader);
+        return provideObjectMapper().readerFor(provideClass()).readValues(provideInputStream());
     }
 
     /**
-     * @return The {@link File} from which data is read.
+     * @return The {@link InputStream} from which data is read.
      */
-    protected abstract File provideFile() throws IOException;
+    protected abstract InputStream provideInputStream() throws IOException;
 
     /**
      * @return The {@link ObjectMapper} used to read data.
