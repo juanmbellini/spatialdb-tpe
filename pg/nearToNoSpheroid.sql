@@ -13,4 +13,5 @@ SELECT
     type_value,
     types 
 FROM sube_branches_geography
-WHERE ST_DWithin(location, ('SRID=4326;POINT(' || :lon || ' ' || :lat || ')')::geography, :distance, false);
+WHERE ST_DWithin(location, ('SRID=4326;POINT(' || :lon || ' ' || :lat || ')')::geography, :distance, false)
+ORDER BY ST_Distance(location, ('SRID=4326;POINT(' || :lon || ' ' || :lat || ')')::geography, false);
