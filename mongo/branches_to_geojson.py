@@ -96,8 +96,8 @@ def main(args):
         'geometry': {
             'type': 'Point',
             'coordinates': [
-                branch['lon'],
-                branch['lat']
+                float(branch['lon']),
+                float(branch['lat'])
             ]
         }
     }, branches)
