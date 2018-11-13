@@ -18,4 +18,4 @@ FROM cities_geography AS c
     LEFT JOIN sube_branches_geography AS b
        ON ST_DWithin(b.location, c.location, :distance, :spheroid)
 GROUP BY c.id
-ORDER BY count(b), c.name;
+ORDER BY c.name;
