@@ -1,6 +1,7 @@
-// Arguments
-var distance = 100;
+// Timing
+var before = Date.now();
 
+// Arguments
 function branch_to_useful (branch) {
 	return {
 		"description": branch.properties.description,
@@ -38,3 +39,4 @@ function city_branches (city) {
 // Query
 var cities = db.cities.find().sort({"properties.nombre": 1}).map(city_branches);
 printjson(cities);
+print(`Time elapsed: ${Date.now() - before} ms.`)
