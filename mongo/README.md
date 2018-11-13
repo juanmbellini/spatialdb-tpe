@@ -27,6 +27,9 @@ It is assumed that data is already loaded.
 In order to get all branches within a certain distance, using a given point as a center, you can use the ```nearTo.js``` Mongo script. This script will calculate the result sorting by distance.
 
 ```js
+// Timing
+var before = Date.now();
+
 // Variables
 var center = {
     "type" : "Point",
@@ -48,7 +51,7 @@ var result = db.sube_branches.find({
 var arr = result.toArray();
 printjson(arr);
 print(`Found ${arr.length} records`);
-
+print(`Time elapsed: ${Date.now() - before} ms.`)
 ```
 
 ```
@@ -63,6 +66,9 @@ $ mongo spatialdb-tpe mongo/nearTo.js \
 If sorting is not important for you, this other script can help (```nearToUnsorted.js```).
 
 ```js
+// Timing
+var before = Date.now();
+
 // Constants
 var EARTH_RADIUS_IN_METERS_APROX = 6378.1 * 1000;
 
@@ -91,6 +97,7 @@ var result = db.sube_branches.find({
 });
 printjson(result.toArray());
 print(`Found ${result.count()} records`);
+print(`Time elapsed: ${Date.now() - before} ms.`)
 ```
 
 ```
@@ -108,9 +115,13 @@ The difference between both scripts is that the first one uses ```$nearSphere```
 
 ### Get all branches within a distance from each city
 
-This query will return all the branches that are within a certian distance from each city saved in the database. Is similar to the previous queries, but using as a center the saved cities points. The SQL script to be used is ```cityBranches.js```.
+This query will return all the branches that are within a certian distance from each city saved in the database. Is similar to the previous queries, but using as a center the saved cities points. The Mongo script to be used is ```cityBranches.js```.
 
 ```js
+// Timing
+var before = Date.now();
+
+// Arguments
 function branch_to_useful (branch) {
 	return {
 		"description": branch.properties.description,
@@ -148,6 +159,7 @@ function city_branches (city) {
 // Query
 var cities = db.cities.find().sort({"properties.nombre": 1}).map(city_branches);
 printjson(cities);
+print(`Time elapsed: ${Date.now() - before} ms.`)
 ```
 
 ```
