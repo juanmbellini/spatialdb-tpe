@@ -28,4 +28,18 @@ curl -s $CITIES_DATA_URL | mongoimport \
     --jsonArray
 echo "Finished loading cities"
 
+echo "Creating geospatial index for branches collection"
+mongo spatialdb-tpe \
+    --port=27017 \
+    --host=localhost \
+    --eval="db.sube_branches.createIndex({geometry: \"2dsphere\"});"
+echo "Finished creating geospatial index for branches collection"
+
+echo "Creating geospatial index for cities collection"
+mongo spatialdb-tpe \
+    --port=27017 \
+    --host=localhost \
+    --eval="db.cities.createIndex({geometry: \"2dsphere\"});"
+echo "Finished creating geospatial index for branches collection"
+
 echo "Finished loading Data to MongoDB"
