@@ -23,7 +23,7 @@ It is assumed that schema is already generated and data is already loaded
 
 ### Get all branches within a point
 
-In order to get all branches within a certain distance, using a given point as a center, you can use the ```nearTo.sql``` SQL script. The spheroid variable must be set to ```true``` of ```false``` in order to set how the distance must be calculated.
+In order to get all branches within a certain distance, using a given point as a center, you can use the ```nearTo.sql``` SQL script. The spheroid variable must be set to ```true``` or ```false``` in order to set how the distance must be calculated.
 
 ```sql
 \timing
@@ -63,15 +63,25 @@ This query will return all the branches that are within a certian distance from 
 ```sql
 \timing
 SELECT
-    c.name                                              AS "City Name",
-    jsonb_pretty(json_agg(json_build_object(
-        'description', b.description,
-        'location', ST_AsText(b.location)
-    ))::jsonb)                                          AS "Branches near"
-FROM cities_geography as c, sube_branches_geography as b
-WHERE ST_DWithin(b.location, c.location, :distance, :spheroid)
-GROUP BY c.id, c.name
-ORDER BY c.name;
+    c.name                                                                      AS "City Name",
+    CASE
+        WHEN count(b) = 0 THEN '[ ]'
+        ELSE  jsonb_pretty(
+            json_agg(
+                json_build_object(
+                    'description', b.description,
+                    'location', ST_AsText(b.location),
+                    'distance', ST_Distance(b.location, c.location, :spheroid)
+             ) ORDER BY ST_Distance(b.location, c.location, :spheroid)
+           )::jsonb
+        )
+    END                                                                         AS "Branches near",
+    count(b)                                                                    AS "Amount"
+FROM cities_geography AS c
+    LEFT JOIN sube_branches_geography AS b
+       ON ST_DWithin(b.location, c.location, :distance, :spheroid)
+GROUP BY c.id
+ORDER BY count(b), c.name;
 ```
 
 ```
