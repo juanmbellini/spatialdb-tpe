@@ -11,4 +11,4 @@ function [sums, means, stds, vars, medians, data] = analyze(data_dir, output_dir
 	means = mean(data);
 	stds = std(data);
 	vars = var(data);
-	medians = var(data);
+	medians = median(data);
