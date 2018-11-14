@@ -70,8 +70,10 @@ public class DatabaseWrapperImpl implements DatabaseWrapper {
     @Transactional
     public void dropData() {
         jdbcTemplate.update("DELETE FROM sube_branches_geography");
+        jdbcTemplate.update("DELETE FROM sube_branches_geometry");
         jdbcTemplate.update("DELETE FROM cities_geography");
     }
+
 
     /**
      * Adds a city's data to the database.
@@ -97,12 +99,23 @@ public class DatabaseWrapperImpl implements DatabaseWrapper {
     }
 
     /**
-     * Adds a sube branch's data to the database.
+     * Adds a branch to the database in all the necessary tables.
      *
      * @param branch The {@link ar.edu.itba.spatial_db.tpe.pg_loader.util.SubeBranchTsvDataReader.SubeBranchDto}
      *               containing the data.
      */
     private void addBranchToDatabase(final SubeBranchTsvDataReader.SubeBranchDto branch) {
+        addBranchGeographyToDatabase(branch);
+        addBranchGeometryToDatabase(branch);
+    }
+
+    /**
+     * Adds a sube branch's data to the database, using the geography table.
+     *
+     * @param branch The {@link ar.edu.itba.spatial_db.tpe.pg_loader.util.SubeBranchTsvDataReader.SubeBranchDto}
+     *               containing the data.
+     */
+    private void addBranchGeographyToDatabase(final SubeBranchTsvDataReader.SubeBranchDto branch) {
         jdbcTemplate.update(
                 "INSERT INTO sube_branches_geography " +
                         "(location, branch_type, " +
@@ -110,6 +123,41 @@ public class DatabaseWrapperImpl implements DatabaseWrapper {
                         "city, address, province, open_time, type_value, types) " +
                         "VALUES " +
                         "(ST_GeomFromEWKT(?), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
+                        "ON CONFLICT DO NOTHING",
+                "SRID=4326;Point(" + branch.getLongitude() + branch.getLatitude() + ")",
+                branch.getBranchType(),
+                branch.getScore(),
+                branch.isReportable(),
+                branch.getDescription(),
+                branch.getCompanyId(),
+                branch.getCity(),
+                branch.getAddress(),
+                branch.getProvince(),
+                branch.getOpenTime(),
+                branch.getType(),
+                Arrays.stream(branch.getTypes())
+                        .map(Object::toString)
+                        .collect(Collectors.joining(",", "[", "]"))
+
+        );
+
+    }
+
+
+    /**
+     * Adds a sube branch's data to the database, using the geometry table.
+     *
+     * @param branch The {@link ar.edu.itba.spatial_db.tpe.pg_loader.util.SubeBranchTsvDataReader.SubeBranchDto}
+     *               containing the data.
+     */
+    private void addBranchGeometryToDatabase(final SubeBranchTsvDataReader.SubeBranchDto branch) {
+        jdbcTemplate.update(
+                "INSERT INTO sube_branches_geometry " +
+                        "(location, branch_type, " +
+                        "score, is_reportable, description, company_id, " +
+                        "city, address, province, open_time, type_value, types) " +
+                        "VALUES " +
+                        "(ST_Transform(ST_GeomFromEWKT(?), 5346), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
                         "ON CONFLICT DO NOTHING",
                 "SRID=4326;Point(" + branch.getLongitude() + branch.getLatitude() + ")",
                 branch.getBranchType(),
