@@ -22,48 +22,9 @@ $ bash dropData.sh
 
 It is assumed that data is already loaded.
 
-### Get all branches within a point
+### Get all branches within a point (with 2D index)
 
-In order to get all branches within a certain distance, using a given point as a center, you can use the ```nearTo.js``` Mongo script. This script will calculate the result sorting by distance.
-
-```js
-// Timing
-var before = Date.now();
-
-// Variables
-var center = {
-    "type" : "Point",
-    "coordinates" : [
-        longitude,
-        latitude
-    ]
-};
-
-// Query
-var result = db.sube_branches.find({ 
-    geometry: {
-        $nearSphere: {
-            $geometry: center, 
-            $maxDistance: distance
-        } 
-    } 
-})
-var arr = result.toArray();
-printjson(arr);
-print(`Found ${arr.length} records`);
-print(`Time elapsed: ${Date.now() - before} ms.`)
-```
-
-```
-$ mongo spatialdb-tpe mongo/nearTo.js \
-    --port=27017 \
-    --host=localhost \
-    --eval="var distance = 1000;var longitude = -58.4079;var latitude = -34.6101;"
-```
-
-**Note that the distance variable is in meters.**
-
-If sorting is not important for you, this other script can help (```nearToUnsorted.js```).
+In order to get all branches within a certain distance, using a given point as a center, you can use the ```nearTo2D.js``` Mongo script. This script will calculate the result sorting by distance. Note that this query uses the collection with the 2D index.
 
 ```js
 // Timing
@@ -80,28 +41,22 @@ var center = {
         latitude
     ]
 };
-var radius = distance / EARTH_RADIUS_IN_METERS_APROX;
-
-var region = {
-    $centerSphere: [
-        center.coordinates,
-        radius
-    ]
-};
 
 // Query
-var result = db.sube_branches.find({
-   geometry: {
-       $geoWithin: region
-    }
+var result = db.sube_branches_2d.find({
+    "geometry.coordinates": {
+        $nearSphere: center.coordinates,
+        $maxDistance: distance / EARTH_RADIUS_IN_METERS_APROX
+    } 
 });
-printjson(result.toArray());
-print(`Found ${result.count()} records`);
+var arr = result.toArray();
+printjson(arr);
+print(`Found ${arr.length} records`);
 print(`Time elapsed: ${Date.now() - before} ms.`)
 ```
 
 ```
-$ mongo spatialdb-tpe mongo/nearToUnsorted.js \
+$ mongo spatialdb-tpe mongo/nearTo2D.js \
     --port=27017 \
     --host=localhost \
     --eval="var distance = 1000;var longitude = -58.4079;var latitude = -34.6101;"
@@ -109,7 +64,49 @@ $ mongo spatialdb-tpe mongo/nearToUnsorted.js \
 
 **Note that the distance variable is in meters.**
 
-The difference between both scripts is that the first one uses ```$nearSphere```, and the second one ```$geoWithin```.
+
+### Get all branches within a point (with 2DSphere index)
+
+In order to get all branches within a certain distance, using a given point as a center, you can use the ```nearTo2DSphere.js``` Mongo script. This script will calculate the result sorting by distance. Note that this query uses the collection with the 2DSphere index.
+
+```js
+// Timing
+var before = Date.now();
+
+// Variables
+var center = {
+    "type" : "Point",
+    "coordinates" : [
+        longitude,
+        latitude
+    ]
+};
+
+// Query
+var result = db.sube_branches_2dsphere.find({
+    geometry: {
+        $nearSphere: {
+            $geometry: center,
+            $maxDistance: distance
+        }
+    }
+})
+var arr = result.toArray();
+printjson(arr);
+print(`Found ${arr.length} records`);
+print(`Time elapsed: ${Date.now() - before} ms.`)
+```
+
+```
+$ mongo spatialdb-tpe mongo/nearTo2DSphere.js \
+    --port=27017 \
+    --host=localhost \
+    --eval="var distance = 1000;var longitude = -58.4079;var latitude = -34.6101;"
+```
+
+**Note that the distance variable is in meters.**
+
+
 
 
 

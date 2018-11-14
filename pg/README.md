@@ -21,9 +21,9 @@ In order to load data check the pg-loader module.
 
 It is assumed that schema is already generated and data is already loaded
 
-### Get all branches within a point
+### Get all branches within a point (with geography)
 
-In order to get all branches within a certain distance, using a given point as a center, you can use the ```nearTo.sql``` SQL script. The spheroid variable must be set to ```true``` or ```false``` in order to set how the distance must be calculated.
+In order to get all branches within a certain distance, using a given point as a center, you can use the ```nearTo.sql``` SQL script. The spheroid variable must be set to ```true``` or ```false``` in order to set how the distance must be calculated. This query uses the table in which geolocation data is stored as geography.
 
 ```sql
 \timing
@@ -48,6 +48,39 @@ ORDER BY ST_Distance(location, ('SRID=4326;POINT(' || :lon || ' ' || :lat || ')'
 
 ```
 $ psql <database-name>  -f nearTo.sql -v lat=-34.6101 -v lon=-58.4079 -v distance=100 -v spheroid=false
+```
+
+**Note that the distance variable is in meters.**
+
+The result will be returned ordered by distance
+
+### Get all branches within a point (with geometry)
+
+In order to get all branches within a certain distance, using a given point as a center, you can use the ```nearToGeometry.sql``` SQL script. This query used the table in which geolocation data is stored as geometry.
+
+```sql
+\timing
+SELECT
+    id                  AS "Branch id",
+    ST_AsText(location) AS "Location",
+    branch_type         AS "Branch type",
+    score               AS "Score",
+    description         AS "Description",
+    is_reportable       AS "Is Reportable?",
+    company_id          AS "Company id",
+    city                AS "City",
+    address             AS "Address",
+    province            AS "Province",
+    open_time           AS "Open time",
+    type_value          AS "Type",
+    types               AS "Types"
+FROM sube_branches_geometry
+WHERE ST_DWithin(location, ST_Transform(ST_GeomFromEWKT('SRID=4326;Point(' || :lon || ' ' || :lat || ')'), 5346), :distance)
+ORDER BY ST_Distance(location, ST_Transform(ST_GeomFromEWKT('SRID=4326;Point(' || :lon || ' ' || :lat || ')'), 5346));
+```
+
+```
+$ psql <database-name>  -f nearToGeometry.sql -v lat=-34.6101 -v lon=-58.4079 -v distance=100
 ```
 
 **Note that the distance variable is in meters.**

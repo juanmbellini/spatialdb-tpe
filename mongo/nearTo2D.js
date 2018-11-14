@@ -14,7 +14,7 @@ var center = {
 };
 
 // Query
-var result = db.sube_branches_2d.find({ 
+var result = db.sube_branches_2d.find({
     "geometry.coordinates": {
         $nearSphere: center.coordinates,
         $maxDistance: distance / EARTH_RADIUS_IN_METERS_APROX

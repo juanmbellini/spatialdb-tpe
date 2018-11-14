@@ -14,10 +14,10 @@ var center = {
 var result = db.sube_branches_2dsphere.find({
     geometry: {
         $nearSphere: {
-            $geometry: center, 
+            $geometry: center,
             $maxDistance: distance
-        } 
-    } 
+        }
+    }
 })
 var arr = result.toArray();
 printjson(arr);
